@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: john
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  queries:
+    image: postgres:latest
+    depends_on:
+      - db
+    volumes:
+      - ./sql:/sql
+      - ./entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    entrypoint: ["/docker-entrypoint-initdb.d/entrypoint.sh"]
+    environment:
+      PGDB: test_db
+      PGUSER: john
+      PGPASSWORD: 1234
+      TASK: $TASK
+
+volumes:
+  postgres_data:
